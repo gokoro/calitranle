@@ -1,8 +1,7 @@
 import * as fs from 'fs'
-import { translator } from './libs/deepl.js'
+import { getDeeplPage, getTranslated } from './libs/deepl-playwright.js'
 
-const dir =
-  '/Users/lincroe/Downloads/りく, 海空/カノジョの妹とキスをした。２ (GA文庫)/カノジョの妹とキスをした。２ (GA文庫) - 海空 りく/_c7niof3_files/text'
+const dir = './dist'
 
 const fileNames = fs.readdirSync(dir)
 
@@ -15,12 +14,12 @@ async function processFile(text: string) {
 
   const tagsRemovedLines = originalLines.map((str) => removeTags(str))
 
-  const translated = await translateHTML(tagsRemovedLines)
-  const translatedLines = translated.map(({ text }) => text)
+  // const translated = await translateText(tagsRemovedLines.splice(0, 5))
+  const translated = await translateText(tagsRemovedLines)
 
-  tagsRemovedLines.forEach((sourceText, idx) => {
-    const targetText = translatedLines[idx]
-    text.replace(sourceText, targetText)
+  originalLines.forEach((sourceText, idx) => {
+    const targetText = translated[idx]
+    text = text.replace(sourceText, `<p class="calibre3">${targetText}</p>`)
   })
 
   return text
@@ -38,24 +37,79 @@ function removeTags(text: string) {
   return replaced
 }
 
-async function translateHTML<T extends string | string[]>(text: T) {
-  return await translator.translateText<T>(text, 'ja', 'ko')
+async function translateText<T extends string | string[]>(text: T) {
+  const page = await getDeeplPage()
+
+  const translated = await getTranslated({ page, text })
+  return translated
+
+  // return await translator.translateText<T>(text, 'ja', 'ko')
 }
+
+const errorList = []
 
 let count = 0
 
-fileNames.forEach(async (file) => {
-  if (count > 0) {
-    return
-  }
+async function launch() {
+  for (const file of fileNames) {
+    console.log('count:', count)
+    // if (count > 0) {
+    //   return
+    // }
 
-  const path = `${dir}/${file}`
-  // const text = fs.readFileSync(path, 'utf-8')
-  const text = fs.readFileSync(`${dir}/part0012.html`, 'utf-8')
+    const path = `${dir}/${file}`
+    const text = fs.readFileSync(path, 'utf-8')
+    console.log('path:', path)
+    // const text = fs.readFileSync(`${dir}/part0012.html`, 'utf-8')
+
+    try {
+      const processed = await processFile(text)
+      console.log('processed:', processed)
+      fs.writeFileSync(path, processed || text)
+    } catch (error) {
+      errorList.push({ errorMessage: error, errorFile: path })
+    }
+
+    count += 1
+  }
+}
+async function promiseLaunch() {
+  await Promise.all(
+    fileNames.map(async (file) => {
+      console.log('count:', count)
+      // if (count > 0) {
+      //   return
+      // }
+
+      const path = `${dir}/${file}`
+      const text = fs.readFileSync(path, 'utf-8')
+      console.log('path:', path)
+      // const text = fs.readFileSync(`${dir}/part0012.html`, 'utf-8')
+
+      try {
+        const processed = await processFile(text)
+        console.log('processed:', processed)
+        fs.writeFileSync(path, processed || text)
+      } catch (error) {
+        errorList.push({ errorMessage: error, errorFile: path })
+      }
+
+      count += 1
+    })
+  )
+}
+promiseLaunch()
+
+// launch()
+
+// testLaunch()
+
+async function testLaunch() {
+  const text = fs.readFileSync(`${dir}/part0016.html`, 'utf-8')
 
   const processed = await processFile(text)
-  console.log('processed:', processed)
-  fs.writeFileSync(path, processed || text)
 
-  count += 1
-})
+  if (!processed) throw new Error()
+
+  fs.writeFileSync(`${dir}/part0016.html`, processed, { encoding: 'utf-8' })
+}
