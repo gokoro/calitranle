@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/swcrc",
+  "module": {
+    "type": "es6",
+    "strictMode": true
+  },
+  "env": {
+    "targets": {
+      "node": "18"
+    }
+  },
+  "jsc": {
+    "parser": {
+      "syntax": "typescript"
+    }
+  }
+}

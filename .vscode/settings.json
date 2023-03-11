@@ -1,4 +1,6 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "html.format.enable": true
+  "html.format.enable": true,
+  "explorer.excludeGitIgnore": false,
+  "search.useIgnoreFiles": false
 }

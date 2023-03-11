@@ -1,6 +1,6 @@
 import retry from 'async-retry'
-import type { Browser, Page } from 'playwright'
-import { getPage } from './playwright.js'
+import type { Browser, Page } from 'puppeteer'
+import { getPage } from '../libs/_puppeteer.js'
 
 let deeplPage: Page | undefined
 let deeplBrowser: Browser | undefined
@@ -14,8 +14,12 @@ export async function getDeeplPage() {
 
   await page.goto('https://www.deepl.com/')
 
-  page.locator('button[dl-test=translator-source-lang-btn]').click()
-  page.locator('button[dl-test=translator-lang-option-ja]').click()
+  await page
+    .waitForSelector('button[dl-test=translator-source-lang-btn]')
+    .then((el) => el?.click())
+  await page
+    .waitForSelector('button[dl-test=translator-lang-option-ja]')
+    .then((el) => el?.click())
 
   deeplPage = page
   deeplBrowser = browser
@@ -45,7 +49,6 @@ export async function getTranslated<T extends string | string[]>({
   page: Page
 }): Promise<T> {
   i += 1
-  console.log(i)
   console.log('text:', text)
 
   if (Array.isArray(text)) {
@@ -72,16 +75,13 @@ export async function getTranslated<T extends string | string[]>({
   }
   console.log('second', i)
 
-  const resPromise = page.waitForResponse('**/jsonrpc?method=LMT_handle_jobs')
-
-  page
-    .locator('.lmt__source_textarea')
-    .locator('div[contenteditable=true]')
-    .fill(text)
+  await page.focus('.lmt__source_textarea div[contenteditable=true]')
+  await page.keyboard.type(text)
 
   let deeplData
 
   try {
+    const resPromise = page.waitForResponse('**/jsonrpc?method=LMT_handle_jobs')
     const res = await resPromise
     deeplData = await res.json()
   } catch (error) {
