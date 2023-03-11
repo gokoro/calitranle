@@ -3,7 +3,7 @@ import { createDeeplPlaywrightAdapter as createAdapter } from './adapters/index.
 import { Adapter, AdapterSession } from './adapters/types.js'
 import { getContentLines, removeTags, replaceTexts } from './utils/contents.js'
 
-const dir = '/Users/lincroe/Documents/Project/translate-clibre-html/assets'
+const dir = '/' // Absolute path
 
 const fileNames = fs.readdirSync(dir)
 
