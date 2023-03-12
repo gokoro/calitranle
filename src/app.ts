@@ -1,31 +1,60 @@
+import { Command } from 'commander'
 import * as fs from 'fs'
+import { mkdirp } from 'mkdirp'
+import { dirname, resolve } from 'path'
+import { fileURLToPath } from 'url'
 import { createDeeplPlaywrightAdapter as createAdapter } from './adapters/index.js'
 import { Adapter, AdapterSession } from './adapters/types.js'
 import { getContentLines, removeTags, replaceTexts } from './utils/contents.js'
 
-const dir = '/' // Absolute path
+const dirName = dirname(
+  fileURLToPath(
+    import.meta.url || require('url').pathToFileURL(__filename).toString()
+  )
+)
 
-const fileNames = fs.readdirSync(dir)
+const program = new Command()
 
-;(async () => {
+program
+  .argument('<path>', 'An input folder that will be processed')
+  .option('-o, --output [path]', 'Directory to save outputs')
+  .action(action)
+
+program.parse()
+
+async function action(path: string, options: { output: string }) {
+  const dir = resolve(
+    Object.hasOwn(process, 'pkg') ? dirname(process.execPath) : dirName,
+    path
+  )
+  const outputDir = `${dir}/outputs`
+
+  await mkdirp(outputDir)
+
+  const fileNames = fs.readdirSync(dir)
+
   const adapter = await createAdapter()
 
   await Promise.all(
     fileNames.map(async (file) => {
       const path = `${dir}/${file}`
+      const outputPath = `${options.output || outputDir}/${file}`
+
+      if (fs.lstatSync(path).isDirectory()) {
+        return
+      }
+
       const text = fs.readFileSync(path, 'utf-8')
 
       console.log('Processing:', path)
 
       const processed = await processFile(text, adapter)
-      fs.writeFileSync(path, processed || text)
+      fs.writeFileSync(outputPath, processed || text)
 
       console.log('Done: ', path)
     })
   )
-
-  process.exit(0)
-})()
+}
 
 async function processFile<T extends AdapterSession>(
   text: string,
