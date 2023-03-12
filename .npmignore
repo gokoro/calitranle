@@ -1,0 +1,5 @@
+.envrc
+assets
+node_modules
+packaged
+!dist
