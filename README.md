@@ -2,7 +2,9 @@
 
 A tool for translating a [calibre](https://calibre-ebook.com)-created epub file 📖
 
----
+## Usage
+
+### CLI
 
 ## Supported Adapters
 
