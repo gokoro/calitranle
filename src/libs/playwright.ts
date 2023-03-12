@@ -1,14 +1,6 @@
 import type { Browser, BrowserContext } from 'playwright'
 import { chromium, devices } from 'playwright'
 
-export async function getPage() {
-  const browser = await chromium.launch({ headless: false, devtools: true })
-  const context = await browser.newContext(devices['Desktop Chrome'])
-  const page = await context.newPage()
-
-  return { page, browser }
-}
-
 export class PlaywrightInstance {
   public browser?: Browser
   public context?: BrowserContext

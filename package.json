@@ -1,11 +1,12 @@
 {
   "name": "translate-clibre-html",
   "type": "module",
+  "main": "dist/app.js",
   "scripts": {
     "start": "pnpm build:source && node dist/app.js",
     "build": "swc ./src -d dist",
     "build:source": "swc ./src -d dist",
-    "build:package": "pnpm bundle && pkg bundle/app.cjs --targets linux,macos,win --out-path packaged && rimraf ./bundle",
+    "build:package": "pnpm bundle && pkg bundle/app.cjs --public --targets linux,macos,win --out-path packaged && rimraf bundle ",
     "bundle": "esbuild src/app.ts --bundle --platform=node --format=cjs --minify --outfile=./bundle/app.cjs"
   },
   "devDependencies": {

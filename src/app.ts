@@ -12,6 +12,7 @@ const dirName = dirname(
     import.meta.url || require('url').pathToFileURL(__filename).toString()
   )
 )
+const isPkg = Object.hasOwn(process, 'pkg')
 
 const program = new Command()
 
@@ -23,10 +24,7 @@ program
 program.parse()
 
 async function action(path: string, options: { output: string }) {
-  const dir = resolve(
-    Object.hasOwn(process, 'pkg') ? dirname(process.execPath) : dirName,
-    path
-  )
+  const dir = resolve(isPkg ? dirname(process.execPath) : dirName, path)
   const outputDir = `${dir}/outputs`
 
   await mkdirp(outputDir)
