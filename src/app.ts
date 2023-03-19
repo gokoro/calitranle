@@ -25,7 +25,7 @@ program
 
 program.parse()
 
-async function action(path: string, options: { output: string }) {
+async function action(path = '', options: { output: string }) {
   const dir = resolve(isPkg ? dirname(process.execPath) : dirName, path)
   const outputDir = `${dir}/outputs`
 
