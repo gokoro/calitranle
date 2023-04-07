@@ -1,7 +1,7 @@
 {
   "name": "calitranle",
   "description": "A tool for translating a calibre-created epub file 📖",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "main": "dist/app.js",
   "bin": "dist/app.js",
