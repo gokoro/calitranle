@@ -23,11 +23,11 @@ export class DeeplPlaywrightAdapter
 
     await page.goto('https://www.deepl.com/')
 
-    await page.locator('button[dl-test=translator-source-lang-btn]').click()
-    await page.locator('button[dl-test=translator-lang-option-ja]').click()
+    await page.locator('button[data-testid=translator-source-lang-btn]').click()
+    await page.locator('button[data-testid=translator-lang-option-ja]').click()
 
-    await page.locator('button[dl-test=translator-target-lang-btn]').click()
-    await page.locator('button[dl-test=translator-lang-option-ko]').click()
+    await page.locator('button[data-testid=translator-target-lang-btn]').click()
+    await page.locator('button[data-testid=translator-lang-option-ko]').click()
 
     return new DeeplPlaywrightAdapterSession(page)
   }
