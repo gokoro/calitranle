@@ -3,3 +3,4 @@ dist
 assets
 packaged
 bundle
+.tool-versions

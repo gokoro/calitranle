@@ -18,7 +18,7 @@ export function replaceTexts(
   let result = textToBeReplaced
 
   sources.forEach((sourceText, idx) => {
-    const targetText = targets[idx]
+    const targetText = targets[idx] ?? ''
     result = result.replace(sourceText, `<p class="calibre3">${targetText}</p>`)
   })
 
